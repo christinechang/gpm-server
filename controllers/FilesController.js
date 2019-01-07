@@ -3,35 +3,27 @@ const Files = require('../models/FilesModel'); //import model
 
 const fs = require('fs');
 
-async function isItDirectory(item) {   //make this a promise
-    return (await fs.stat(item, function(err, stats) {
-        return((stats ? true : false));
-    }))
-}
 function sendResult(x) { 
     return new Promise(resolve => {
-        setTimeout(() => {
+        setTimeout(() => {      
             resolve(x);
-            // console.log('sending dirItems')
-          }, 10);
+        }, 10);
     });
   }
              
 class FilesController {
     //GET FIND ALL
-    get(req,res){   //this works sending basic info
-        // console.log(Files); //this works - shows the model
+    get(req,res){   //test sending basic info
+        // console.log(Files); //test shows the model
         let fileArr = [{"name":"filename1"},{"name":"filename2"},{"name":"filename4"}]
-
-        // res.send(fileArr);
         res.json(fileArr);
     }
     async _find(req,res) { //(finds many and returns array)
         var path = '/';         //default value
         try {
-            // const result = await getInfo();//model fetch data 
+            // const result = await getInfo();//model fetch data - need to create promise for this to work 
             await fs.readdir(path, async function(err, items) { 
-                let dirItems = [];  
+                let dirItems = [];  //read in directory items into this array
                 let name, fullpath;
                 for (var i=0; items && i<items.length; i++) {
                     name = items[i];
@@ -57,14 +49,14 @@ class FilesController {
         let {path} =  req.params;
         try {
             await fs.readdir(path, async function(err, items) { 
-                let dirItems = [];  
+                let dirItems = [];  //read in directory items into this array
                 let name, fullpath;
-                for (var i=0; items && i<items.length; i++) {
+                for (var i=0; items && i<items.length; i++) {   //loop through items pushing into array
                     name = items[i];
                     fullpath = path + (path.slice(-1) == '/' ? '': '/') + name;
                     dirItems.push({"name": name,"path":path,"isDir":false, "fullpath":fullpath}); 
                 }
-                for (let i = 0 ; i < dirItems.length ; i++) {
+                for (let i = 0 ; i < dirItems.length ; i++) {   //loop 
                     await fs.stat(dirItems[i].fullpath, function(err, stats) {
                         if (stats && stats.isDirectory()) {
                             dirItems[i].isDir = true;
